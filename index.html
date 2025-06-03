@@ -1,0 +1,238 @@
+<!DOCTYPE html><html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Toko Nazril Store</title>
+  <style>
+    :root {
+      --primary: #0a0f3c;
+      --bg: #0b132b;
+      --text: #ffffff;
+      --card: #1c2541;
+      --accent: #5bc0be;
+    }body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background-color: var(--primary);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+nav {
+  display: flex;
+  gap: 1rem;
+}
+
+nav button {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+nav button:hover {
+  background: #3aafa9;
+}
+
+main {
+  flex-grow: 1;
+  padding: 2rem;
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+section, aside {
+  background: var(--card);
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 0 12px rgba(0,0,0,0.3);
+}
+
+h2 {
+  margin-top: 0;
+}
+
+input, select {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 0.75rem;
+  border-radius: 4px;
+  border: none;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button:disabled {
+  background: #888;
+  cursor: not-allowed;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+li {
+  margin-bottom: 1rem;
+  background: #274060;
+  padding: 0.8rem;
+  border-radius: 8px;
+}
+
+img {
+  max-width: 100%;
+  border-radius: 8px;
+  margin: 0.5rem 0;
+}
+
+pre {
+  white-space: pre-wrap;
+  background: #274060;
+  padding: 1rem;
+  border-radius: 8px;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+#loginScreen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(to bottom, #0b132b, #1c2541);
+  min-height: 100vh;
+}
+
+.login-card {
+  background: var(--card);
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+}
+
+.login-card h2 {
+  margin-bottom: 1rem;
+}
+
+.login-card input {
+  margin-bottom: 1rem;
+}
+
+#mainContent, #adminPanel, header {
+  display: none;
+}
+
+  </style>
+</head>
+<body>
+  <div id="loginScreen">
+    <div class="login-card">
+      <h2>🔥𝗧𝗢𝗞𝗢 𝗡𝗔𝗭𝗥𝗜𝗟 𝗦𝗧𝗢𝗥𝗘🔥</h2>
+      <input type="text" id="loginUsername" placeholder="Username" />
+      <input type="password" id="loginPassword" placeholder="Password" />
+      <button onclick="login()">Masuk</button>
+    </div>
+  </div> 🔥𝗧𝗢𝗞𝗢 𝗡𝗔𝗭𝗥𝗜𝗟 𝗦𝗧𝗢𝗥𝗘🔥 <header>
+    <h1></h1>
+    <nav>
+      <button onclick="toggleTheme()">🌓 Tema</button>
+      <button onclick="logout()">Logout</button>
+    </nav>
+  </header>  <main id="mainContent">
+    <section>
+      <h2>Produk</h2>
+      <ul id="productList">Silakan login untuk melihat produk.</ul>
+    </section>
+    <aside>
+      <h2>Keranjang</h2>
+      <ul id="cartList"></ul>
+      <p id="total">Total: Rp 0</p>
+      <button onclick="pay()" id="payBtn" disabled>Bayar</button>
+    </aside>
+    <section id="adminPanel">
+      <h2>Produk Nya BosQuh</h2>
+      <input id="newName" placeholder="Nama Produk" />
+      <input id="newPrice" type="number" placeholder="Harga" />
+      <input id="newStock" type="number" placeholder="Stok" />
+      <select id="newVisibility">
+        <option value="public">Publik</option>
+        <option value="private">Privat</option>
+      </select>
+      <input id="newImage" type="file" accept="image/*" />
+      <button onclick="addProduct()">Tambah Produk</button>
+    </section>
+    <section>
+      <h2>Riwayat</h2>
+      <pre id="history">Belum ada transaksi.</pre>
+    </section>
+  </main>  <script>
+    const users = {
+      admin: { password: "admin", role: "admin" },
+      user1: { password: "1234", role: "user" }
+    };
+
+    let currentUser = null;
+
+    function login() {
+      const username = document.getElementById("loginUsername").value.trim();
+      const password = document.getElementById("loginPassword").value.trim();
+      if (users[username] && users[username].password === password) {
+        currentUser = username;
+        document.getElementById("loginScreen").style.display = "none";
+        document.querySelector("header").style.display = "flex";
+        document.getElementById("mainContent").style.display = "grid";
+        document.getElementById("adminPanel").style.display = users[username].role === "admin" ? "block" : "none";
+      } else {
+        alert("Username atau password salah.");
+      }
+    }
+
+    function logout() {
+      currentUser = null;
+      document.getElementById("loginScreen").style.display = "flex";
+      document.querySelector("header").style.display = "none";
+      document.getElementById("mainContent").style.display = "none";
+      document.getElementById("adminPanel").style.display = "none";
+      document.getElementById("loginUsername").value = "";
+      document.getElementById("loginPassword").value = "";
+    }
+
+    function toggleTheme() {
+      const html = document.documentElement;
+      html.dataset.theme = html.dataset.theme === "light" ? "dark" : "light";
+      document.body.style.backgroundColor = html.dataset.theme === "light" ? "#ffffff" : "#0b132b";
+    }
+  </script></body>
+</html>
